@@ -1,1 +1,28 @@
-
+.lap-timer {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .display {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .controls button {
+    margin: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .laps {
+    margin-top: 2rem;
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .laps li {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
