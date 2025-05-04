@@ -2,73 +2,72 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 function App() {
-  // State for minutes, seconds, centiseconds
   const [time, setTime] = useState({ minutes: 0, seconds: 0, centiseconds: 0 });
   const [running, setRunning] = useState(false);
   const [laps, setLaps] = useState([]);
-  const timerRef = useRef(null); // Mutable ref for interval ID
+  const timerRef = useRef(null);
 
-  // useEffect for setting/clearing interval
+  // Format time as MM:SS:CC
+  const pad = (num) => (num < 10 ? "0" + num : num);
+  const formatTime = ({ minutes, seconds, centiseconds }) =>
+    `${pad(minutes)}:${pad(seconds)}:${pad(centiseconds)}`;
+
+  const start = () => {
+    if (!running) setRunning(true);
+  };
+
+  const stop = () => {
+    setRunning(false);
+  };
+
+  const lap = () => {
+    if (running) {
+      setLaps((prev) => [...prev, formatTime(time)]);
+    }
+  };
+
+  const reset = () => {
+    setRunning(false);
+    setTime({ minutes: 0, seconds: 0, centiseconds: 0 });
+    setLaps([]);
+  };
+
+  // Start the interval when running is true
   useEffect(() => {
     if (running) {
       timerRef.current = setInterval(() => {
         setTime((prev) => {
           let { minutes, seconds, centiseconds } = prev;
-          centiseconds += 1;
+          centiseconds++;
           if (centiseconds === 100) {
             centiseconds = 0;
-            seconds += 1;
+            seconds++;
           }
           if (seconds === 60) {
             seconds = 0;
-            minutes += 1;
+            minutes++;
           }
           return { minutes, seconds, centiseconds };
         });
-      }, 10); // 10ms = 1 centisecond
+      }, 10); // Every 10ms
     }
 
-    return () => clearInterval(timerRef.current); // Cleanup on unmount
+    // Clear interval when stopped or unmounted
+    return () => clearInterval(timerRef.current);
   }, [running]);
-
-  const handleStart = () => setRunning(true);
-  const handleStop = () => {
-    setRunning(false);
-    clearInterval(timerRef.current);
-  };
-  const handleReset = () => {
-    setRunning(false);
-    clearInterval(timerRef.current);
-    setTime({ minutes: 0, seconds: 0, centiseconds: 0 });
-    setLaps([]);
-  };
-  const handleLap = () => {
-    const formatted = formatTime(time);
-    setLaps((prevLaps) => [...prevLaps, formatted]);
-  };
-
-  const pad = (num) => (num < 10 ? "0" + num : num);
-  const formatTime = ({ minutes, seconds, centiseconds }) =>
-    `${pad(minutes)}:${pad(seconds)}.${pad(centiseconds)}`;
 
   return (
     <div className="lap-timer">
-      <h1>Lap Timer</h1>
       <div className="display">{formatTime(time)}</div>
       <div className="controls">
-        {!running ? (
-          <button onClick={handleStart}>Start</button>
-        ) : (
-          <button onClick={handleStop}>Stop</button>
-        )}
-        <button onClick={handleLap} disabled={!running}>
-          Lap
-        </button>
-        <button onClick={handleReset}>Reset</button>
+        <button onClick={start}>Start</button>
+        <button onClick={stop}>Stop</button>
+        <button onClick={lap}>Lap</button>
+        <button onClick={reset}>Reset</button>
       </div>
       <ul className="laps">
-        {laps.map((lap, index) => (
-          <li key={index}>Lap {index + 1}: {lap}</li>
+        {laps.map((lapTime, index) => (
+          <li key={index}>Lap {index + 1}: {lapTime}</li>
         ))}
       </ul>
     </div>
@@ -76,4 +75,5 @@ function App() {
 }
 
 export default App;
+
 
